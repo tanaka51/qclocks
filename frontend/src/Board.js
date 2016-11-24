@@ -1,38 +1,41 @@
 import React, { Component } from 'react';
 import moment from 'moment-timezone';
-import Clock from './Clock';
+import TimezoneSelector from './TimezoneSelector';
+import Shelf from './Shelf';
+import './Board.css'
 
 class Board extends Component {
   constructor() {
     super();
     this.state = {
-      baseDate: moment(),
+      timezones: ['Asia/Tokyo']
     };
   }
 
-  componentDidMount() {
-    console.log(moment.tz.names());
-    this.timerID = setInterval(
-      () => this.refresh(),
-      1000
-    );
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timerID);
-  }
-
-  refresh() {
+  addTimezone(timezone) {
+    const timezones = this.state.timezones.slice();
     this.setState({
-      baseDate: moment(),
-    })
+      timezones: timezones.concat([timezone])
+    });
+  }
+
+  removeTimezone(timezone) {
+    const timezones = this.state.timezones.slice();
+    this.setState({
+      timezones: timezones.filter((t) => t !== timezone)
+    });
   }
 
   render() {
     return (
-      <div>
-        <Clock moment={this.state.baseDate.clone().tz('Asia/Tokyo')} />
-        <Clock moment={this.state.baseDate.clone().tz('Europe/London')} />
+      <div className='Board'>
+        <TimezoneSelector
+          timezones={moment.tz.names()}
+          handler={(timezone) => this.addTimezone(timezone)} />
+
+        <Shelf
+          timezones={this.state.timezones}
+          removeHandler={(timezone) => this.removeTimezone(timezone)} />
       </div>
     );
   }
